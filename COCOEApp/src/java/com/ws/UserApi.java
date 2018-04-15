@@ -24,6 +24,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PUT;
 import javax.ws.rs.core.MediaType;
+import util.HashUtil;
 
 /**
  *
@@ -46,6 +47,7 @@ public class UserApi {
         JsonObject object = Json.createReader(new StringReader(content)).readObject();
         String username = object.getString("username");
         String password = object.getString("password");
+        String passwordHash = HashUtil.HashToSHA256Base64(password);
         if (username == "admin" && password == "sanpedro123!") {
             return Json.createObjectBuilder()
                 .add("result", true)
