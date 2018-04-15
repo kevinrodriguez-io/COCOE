@@ -5,7 +5,6 @@
  */
 package com.ws;
 
-import dao.LoginRequest;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.math.BigDecimal;
@@ -30,7 +29,7 @@ import javax.ws.rs.core.MediaType;
  *
  * @author COCOE
  */
-@Path("UserApi")
+@Path("user")
 public class UserApi {
     
     @Context
@@ -43,6 +42,7 @@ public class UserApi {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("login")
     public JsonObject Login(String content) {
+        // CHECK JWT PLS https://dzone.com/articles/securing-jax-rs-endpoints-withnbspjwt
         JsonObject object = Json.createReader(new StringReader(content)).readObject();
         String username = object.getString("username");
         String password = object.getString("password");

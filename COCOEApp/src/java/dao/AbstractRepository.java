@@ -29,7 +29,6 @@ public abstract class AbstractRepository<T> {
         } catch (HibernateException e) {
             System.err.println(e.getMessage());
         } finally {
-            session.flush();
             session.close();
         }
     }
@@ -44,7 +43,6 @@ public abstract class AbstractRepository<T> {
         } catch (HibernateException e) {
             System.err.println(e.getMessage());
         } finally {
-            session.flush();
             session.close();
         }
     }
@@ -59,7 +57,6 @@ public abstract class AbstractRepository<T> {
         } catch (HibernateException e) {
             System.err.println(e.getMessage());
         } finally {
-            session.flush();
             session.close();
         }
     }
@@ -77,7 +74,6 @@ public abstract class AbstractRepository<T> {
             System.err.println(e.getMessage());
             return null;
         } finally {
-            session.flush();
             session.close();
         }
     }
@@ -95,7 +91,6 @@ public abstract class AbstractRepository<T> {
             System.err.println(e.getMessage());
             return null;
         } finally {
-            session.flush();
             session.close();
         }
     }

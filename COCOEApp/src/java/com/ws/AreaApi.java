@@ -7,7 +7,6 @@ package com.ws;
 
 import dao.Area;
 import dao.AreaRepository;
-import dao.LoginRequest;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.math.BigDecimal;
@@ -38,10 +37,11 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
 
 /**
- *
+ * Fully working area api endpoint, it communicates with 
+ * Hibernate via Repository Pattern
  * @author COCOE
  */
-@Path("AreaApi")
+@Path("area")
 public class AreaApi {
     
     @Context
@@ -55,7 +55,7 @@ public class AreaApi {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("")
     public JsonArray All() {
-        List<Area> items = repository.All("area");
+        List<Area> items = repository.All("Area");
         JsonArrayBuilder jsonArrayBuilder = Json.createArrayBuilder();
         for (Area item : items) {
             jsonArrayBuilder.add(Json.createObjectBuilder()
@@ -71,7 +71,7 @@ public class AreaApi {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("{id}")
     public JsonObject Find(@PathParam("id") String id) {
-        Area item = repository.Get("area", Integer.parseInt(id));
+        Area item = repository.Get("Area", Integer.parseInt(id));
         return Json.createObjectBuilder()
                 .add("id", item.getId())
                 .add("code", item.getCode())
@@ -105,34 +105,18 @@ public class AreaApi {
     public JsonObject Create(String content) {
         JsonObject jsonObject = Json.createReader(new StringReader(content)).readObject();
         Area item = new Area();
-        item.setId(jsonObject.getInt("id"));
-        item.setCode(jsonObject.getString("code"));
+        item.setCode(jsonObject.getString("code")); // Pick from settings table
         item.setName(jsonObject.getString("name"));
-        try {
-            item.setCreatedDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(jsonObject.getString("createdDate")));
-        } catch (ParseException ex) {
-            System.err.println(ex.getMessage());
-        }
+        item.setCreatedDate(new Date());
         repository.Create(item);
         return jsonObject;
     }
     
     @DELETE
-    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("delete")
-    public JsonObject Delete(String content) {
-        JsonObject jsonObject = Json.createReader(new StringReader(content)).readObject();
-        Area item = new Area();
-        item.setId(jsonObject.getInt("id"));
-        item.setCode(jsonObject.getString("code"));
-        item.setName(jsonObject.getString("name"));
-        try {
-            item.setCreatedDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(jsonObject.getString("createdDate")));
-        } catch (ParseException ex) {
-            System.err.println(ex.getMessage());
-        }
-        repository.Delete(item);
+    @Path("delete/{id}")
+    public JsonObject Delete(@PathParam("id") String id) {
+        repository.Delete(repository.Get("Area", Integer.parseInt(id)));
         return Json.createObjectBuilder()
                 .add("result", true)
                 .build();
