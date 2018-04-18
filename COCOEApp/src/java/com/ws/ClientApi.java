@@ -6,8 +6,8 @@
 package com.ws;
 
 import auth.JWTTokenNeeded;
-import dao.Area;
-import dao.AreaRepository;
+import dao.Client;
+import dao.ClientRepository;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.math.BigDecimal;
@@ -38,33 +38,38 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
 
 /**
- * Fully working area api endpoint, it communicates with 
+ * Fully working client api endpoint, it communicates with 
  * Hibernate via Repository Pattern
  * @author COCOE
  */
-@Path("area")
-public class AreaApi {
+@Path("client")
+public class ClientApi {
     
     @Context
     private UriInfo context;
     
-    private AreaRepository repository = new AreaRepository();
+    private ClientRepository repository = new ClientRepository();
     
-    public AreaApi(){}
+    public ClientApi(){}
     
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("")
     @JWTTokenNeeded
     public JsonArray All() {
-        List<Area> items = repository.All("Area");
+        List<Client> items = repository.All("Client");
         JsonArrayBuilder jsonArrayBuilder = Json.createArrayBuilder();
-        for (Area item : items) {
+        for (Client item : items) {
             jsonArrayBuilder.add(Json.createObjectBuilder()
                 .add("id", item.getId())
                 .add("code", item.getCode())
                 .add("name", item.getName())
-                .add("createdDate", item.getCreatedDate().toString()));
+                .add("lastName", item.getLastName())
+                .add("active", item.isActive())
+                .add("areaid", item.getAreaid())
+                .add("direction", item.getDirection())
+                .add("createdDate", item.getCreatedDate().toString())
+                .add("lastBillingDate", item.getLastBillingDate().toString()));
         }
         return jsonArrayBuilder.build();
     }
@@ -74,12 +79,17 @@ public class AreaApi {
     @Path("{id}")
     @JWTTokenNeeded
     public JsonObject Find(@PathParam("id") String id) {
-        Area item = repository.Get("Area", Integer.parseInt(id));
+        Client item = repository.Get("Client", Integer.parseInt(id));
         return Json.createObjectBuilder()
                 .add("id", item.getId())
                 .add("code", item.getCode())
                 .add("name", item.getName())
-                .add("createdDate", item.getCreatedDate().toString()).build();
+                .add("lastName", item.getLastName())
+                .add("active", item.isActive())
+                .add("areaid", item.getAreaid())
+                .add("direction", item.getDirection())
+                .add("createdDate", item.getCreatedDate().toString())
+                .add("lastBillingDate", item.getLastBillingDate().toString()).build();
     }
     
     @PUT
@@ -89,8 +99,12 @@ public class AreaApi {
     @JWTTokenNeeded
     public JsonObject Edit(String content) {
         JsonObject jsonObject = Json.createReader(new StringReader(content)).readObject();
-        Area item = repository.Get("Area", Integer.parseInt(jsonObject.getString("id")));
+        Client item = repository.Get("Client", Integer.parseInt(jsonObject.getString("id")));
         item.setName(jsonObject.getString("name"));
+        item.setLastName(jsonObject.getString("lastName"));
+        item.setActive(jsonObject.getBoolean("isActive"));
+        item.setAreaid(jsonObject.getInt("areaid"));
+        item.setDirection(jsonObject.getString("direction"));
         repository.Update(item);
         return jsonObject;
     }
@@ -102,10 +116,12 @@ public class AreaApi {
     @JWTTokenNeeded
     public JsonObject Create(String content) {
         JsonObject jsonObject = Json.createReader(new StringReader(content)).readObject();
-        Area item = new Area(
-            "CODIGO",
-            jsonObject.getString("name"), 
-            new Date()
+        Client item = new Client("CODE", 
+                jsonObject.getString("name"), 
+                jsonObject.getString("lastName"), 
+                jsonObject.getBoolean("isActive"), 
+                jsonObject.getInt("areaid"), 
+                jsonObject.getString("direction"), new Date(), new Date()
         );
         repository.Create(item);
         return jsonObject;
@@ -116,7 +132,7 @@ public class AreaApi {
     @Path("delete/{id}")
     @JWTTokenNeeded
     public JsonObject Delete(@PathParam("id") String id) {
-        repository.Delete(repository.Get("Area", Integer.parseInt(id)));
+        repository.Delete(repository.Get("Client", Integer.parseInt(id)));
         return Json.createObjectBuilder()
                 .add("result", true)
                 .build();

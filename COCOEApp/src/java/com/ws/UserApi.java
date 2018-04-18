@@ -42,8 +42,9 @@ import javax.ws.rs.core.Response;
 import util.HashUtil;
 import util.SimpleKeyGenerator;
 import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
+
 /**
- *
+ * Here is where the JWT magic happens
  * @author COCOE
  */
 @Path("user")

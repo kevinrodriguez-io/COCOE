@@ -6,8 +6,8 @@
 package com.ws;
 
 import auth.JWTTokenNeeded;
-import dao.Area;
-import dao.AreaRepository;
+import dao.Settings;
+import dao.SettingsRepository;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.math.BigDecimal;
@@ -43,28 +43,27 @@ import javax.ws.rs.core.MediaType;
  * @author COCOE
  */
 @Path("area")
-public class AreaApi {
+public class SettingsApi {
     
     @Context
     private UriInfo context;
     
-    private AreaRepository repository = new AreaRepository();
+    private SettingsRepository repository = new SettingsRepository();
     
-    public AreaApi(){}
+    public SettingsApi(){}
     
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("")
     @JWTTokenNeeded
     public JsonArray All() {
-        List<Area> items = repository.All("Area");
+        List<Settings> items = repository.All("Settings");
         JsonArrayBuilder jsonArrayBuilder = Json.createArrayBuilder();
-        for (Area item : items) {
+        for (Settings item : items) {
             jsonArrayBuilder.add(Json.createObjectBuilder()
-                .add("id", item.getId())
-                .add("code", item.getCode())
-                .add("name", item.getName())
-                .add("createdDate", item.getCreatedDate().toString()));
+                .add("settingKey", item.getSettingKey())
+                .add("settingValue", item.getSettingValue())
+            );
         }
         return jsonArrayBuilder.build();
     }
@@ -74,12 +73,11 @@ public class AreaApi {
     @Path("{id}")
     @JWTTokenNeeded
     public JsonObject Find(@PathParam("id") String id) {
-        Area item = repository.Get("Area", Integer.parseInt(id));
+        Settings item = repository.Get("Settings", Integer.parseInt(id));
         return Json.createObjectBuilder()
-                .add("id", item.getId())
-                .add("code", item.getCode())
-                .add("name", item.getName())
-                .add("createdDate", item.getCreatedDate().toString()).build();
+            .add("settingKey", item.getSettingKey())
+            .add("settingValue", item.getSettingValue())
+            .build();
     }
     
     @PUT
@@ -89,37 +87,10 @@ public class AreaApi {
     @JWTTokenNeeded
     public JsonObject Edit(String content) {
         JsonObject jsonObject = Json.createReader(new StringReader(content)).readObject();
-        Area item = repository.Get("Area", Integer.parseInt(jsonObject.getString("id")));
-        item.setName(jsonObject.getString("name"));
+        Settings item = repository.Get("Settings", Integer.parseInt(jsonObject.getString("settingKey")));
+        item.setSettingValue(jsonObject.getString("settingValue"));
         repository.Update(item);
         return jsonObject;
-    }
-    
-    @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    @Path("create")
-    @JWTTokenNeeded
-    public JsonObject Create(String content) {
-        JsonObject jsonObject = Json.createReader(new StringReader(content)).readObject();
-        Area item = new Area(
-            "CODIGO",
-            jsonObject.getString("name"), 
-            new Date()
-        );
-        repository.Create(item);
-        return jsonObject;
-    }
-    
-    @DELETE
-    @Produces(MediaType.APPLICATION_JSON)
-    @Path("delete/{id}")
-    @JWTTokenNeeded
-    public JsonObject Delete(@PathParam("id") String id) {
-        repository.Delete(repository.Get("Area", Integer.parseInt(id)));
-        return Json.createObjectBuilder()
-                .add("result", true)
-                .build();
     }
     
 }
