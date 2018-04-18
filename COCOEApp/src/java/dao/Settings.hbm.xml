@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<!-- Generated Apr 17, 2018 9:02:27 PM by Hibernate Tools 4.3.1 -->
+<hibernate-mapping>
+    <class name="dao.Settings" table="settings" catalog="cocoedb" optimistic-lock="version">
+        <id name="settingKey" type="string">
+            <column name="settingKey" length="50" />
+            <generator class="assigned" />
+        </id>
+        <property name="settingValue" type="string">
+            <column name="settingValue" length="2018" not-null="true" />
+        </property>
+    </class>
+</hibernate-mapping>

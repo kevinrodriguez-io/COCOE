@@ -42,6 +42,10 @@ Contributor(s):
 <hibernate-reverse-engineering>
   <schema-selection match-catalog="cocoedb"/>
   <table-filter match-name="client"/>
+  <table-filter match-name="settings"/>
+  <table-filter match-name="metersessionuser"/>
+  <table-filter match-name="metersession"/>
   <table-filter match-name="area"/>
+  <table-filter match-name="clientmetering"/>
   <table-filter match-name="user"/>
 </hibernate-reverse-engineering>

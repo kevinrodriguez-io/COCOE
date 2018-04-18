@@ -1,5 +1,5 @@
 package dao;
-// Generated 15/04/2018 01:22:22 AM by Hibernate Tools 4.3.1
+// Generated Apr 17, 2018 9:02:26 PM by Hibernate Tools 4.3.1
 
 
 import java.util.Date;
@@ -27,6 +27,7 @@ public class User  implements java.io.Serializable {
      private String passwordHash;
      private String name;
      private String lastName;
+     private String role;
      private Date createdDate;
      private Date lastLoginDate;
 
@@ -34,18 +35,20 @@ public class User  implements java.io.Serializable {
     }
 
 	
-    public User(String userName, String passwordHash, String name, String lastName, Date createdDate) {
+    public User(String userName, String passwordHash, String name, String lastName, String role, Date createdDate) {
         this.userName = userName;
         this.passwordHash = passwordHash;
         this.name = name;
         this.lastName = lastName;
+        this.role = role;
         this.createdDate = createdDate;
     }
-    public User(String userName, String passwordHash, String name, String lastName, Date createdDate, Date lastLoginDate) {
+    public User(String userName, String passwordHash, String name, String lastName, String role, Date createdDate, Date lastLoginDate) {
        this.userName = userName;
        this.passwordHash = passwordHash;
        this.name = name;
        this.lastName = lastName;
+       this.role = role;
        this.createdDate = createdDate;
        this.lastLoginDate = lastLoginDate;
     }
@@ -100,6 +103,16 @@ public class User  implements java.io.Serializable {
     
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    
+    @Column(name="role", nullable=false, length=15)
+    public String getRole() {
+        return this.role;
+    }
+    
+    public void setRole(String role) {
+        this.role = role;
     }
 
     @Temporal(TemporalType.TIMESTAMP)

@@ -30,8 +30,9 @@ public class ServiceConfig extends Application {
      * If required, comment out calling this method in getClasses().
      */
     private void addRestResourceClasses(Set<Class<?>> resources) {
+        resources.add(auth.JWTTokenNeededFilter.class);
         resources.add(com.ws.AreaApi.class);
-        resources.add(com.ws.UserApi.class);
         //resources.add(com.ws.Acciones.class);
+        resources.add(com.ws.UserApi.class);
     }
 }

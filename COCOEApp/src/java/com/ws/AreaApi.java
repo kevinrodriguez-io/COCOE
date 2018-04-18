@@ -5,6 +5,7 @@
  */
 package com.ws;
 
+import auth.JWTTokenNeeded;
 import dao.Area;
 import dao.AreaRepository;
 import java.io.StringReader;
@@ -54,6 +55,7 @@ public class AreaApi {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("")
+    @JWTTokenNeeded
     public JsonArray All() {
         List<Area> items = repository.All("Area");
         JsonArrayBuilder jsonArrayBuilder = Json.createArrayBuilder();
@@ -70,6 +72,7 @@ public class AreaApi {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("{id}")
+    @JWTTokenNeeded
     public JsonObject Find(@PathParam("id") String id) {
         Area item = repository.Get("Area", Integer.parseInt(id));
         return Json.createObjectBuilder()
@@ -83,17 +86,12 @@ public class AreaApi {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("edit")
+    @JWTTokenNeeded
     public JsonObject Edit(String content) {
         JsonObject jsonObject = Json.createReader(new StringReader(content)).readObject();
-        Area item = new Area();
-        item.setId(jsonObject.getInt("id"));
+        Area item = repository.Get("Area", Integer.parseInt(jsonObject.getString("id")));
         item.setCode(jsonObject.getString("code"));
         item.setName(jsonObject.getString("name"));
-        try {
-            item.setCreatedDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(jsonObject.getString("createdDate")));
-        } catch (ParseException ex) {
-            System.err.println(ex.getMessage());
-        }
         repository.Update(item);
         return jsonObject;
     }
@@ -102,12 +100,14 @@ public class AreaApi {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Path("create")
+    @JWTTokenNeeded
     public JsonObject Create(String content) {
         JsonObject jsonObject = Json.createReader(new StringReader(content)).readObject();
-        Area item = new Area();
-        item.setCode(jsonObject.getString("code")); // Pick from settings table
-        item.setName(jsonObject.getString("name"));
-        item.setCreatedDate(new Date());
+        Area item = new Area(
+            jsonObject.getString("code"), 
+            jsonObject.getString("name"), 
+            new Date()
+        );
         repository.Create(item);
         return jsonObject;
     }
@@ -115,6 +115,7 @@ public class AreaApi {
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
     @Path("delete/{id}")
+    @JWTTokenNeeded
     public JsonObject Delete(@PathParam("id") String id) {
         repository.Delete(repository.Get("Area", Integer.parseInt(id)));
         return Json.createObjectBuilder()

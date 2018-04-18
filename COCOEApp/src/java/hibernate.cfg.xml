@@ -46,8 +46,12 @@ Contributor(s):
     <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/cocoedb?zeroDateTimeBehavior=convertToNull</property>
     <property name="hibernate.connection.username">cocoedbuser</property>
     <property name="hibernate.connection.password">Discos2423</property>
-    <mapping resource="dao/User.hbm.xml"/>
+    <mapping resource="dao/Metersessionuser.hbm.xml"/>
     <mapping resource="dao/Area.hbm.xml"/>
+    <mapping resource="dao/Clientmetering.hbm.xml"/>
+    <mapping resource="dao/Settings.hbm.xml"/>
     <mapping resource="dao/Client.hbm.xml"/>
+    <mapping resource="dao/User.hbm.xml"/>
+    <mapping resource="dao/Metersession.hbm.xml"/>
   </session-factory>
 </hibernate-configuration>
