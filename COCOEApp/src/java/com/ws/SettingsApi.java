@@ -42,7 +42,7 @@ import javax.ws.rs.core.MediaType;
  * Hibernate via Repository Pattern
  * @author COCOE
  */
-@Path("area")
+@Path("settings")
 public class SettingsApi {
     
     @Context
@@ -53,8 +53,7 @@ public class SettingsApi {
     public SettingsApi(){}
     
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    @Path("")
+    @Path("/")
     @JWTTokenNeeded
     public JsonArray All() {
         List<Settings> items = repository.All("Settings");
@@ -69,7 +68,6 @@ public class SettingsApi {
     }
     
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
     @Path("{id}")
     @JWTTokenNeeded
     public JsonObject Find(@PathParam("id") String id) {
@@ -81,7 +79,6 @@ public class SettingsApi {
     }
     
     @PUT
-    @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("edit")
     @JWTTokenNeeded

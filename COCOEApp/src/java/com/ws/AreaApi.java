@@ -53,8 +53,7 @@ public class AreaApi {
     public AreaApi(){}
     
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    @Path("")
+    @Path("/")
     @JWTTokenNeeded
     public JsonArray All() {
         List<Area> items = repository.All("Area");
@@ -70,7 +69,6 @@ public class AreaApi {
     }
     
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
     @Path("{id}")
     @JWTTokenNeeded
     public JsonObject Find(@PathParam("id") String id) {
@@ -83,7 +81,6 @@ public class AreaApi {
     }
     
     @PUT
-    @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("edit")
     @JWTTokenNeeded
@@ -97,7 +94,6 @@ public class AreaApi {
     
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     @Path("create")
     @JWTTokenNeeded
     public JsonObject Create(String content) {
@@ -112,7 +108,6 @@ public class AreaApi {
     }
     
     @DELETE
-    @Produces(MediaType.APPLICATION_JSON)
     @Path("delete/{id}")
     @JWTTokenNeeded
     public JsonObject Delete(@PathParam("id") String id) {

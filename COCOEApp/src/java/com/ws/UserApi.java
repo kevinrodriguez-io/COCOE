@@ -83,7 +83,7 @@ public class UserApi {
                     .setExpiration(toDate(LocalDateTime.now().plusMinutes(15L)))
                     .signWith(SignatureAlgorithm.HS512, key)
                     .compact();
-            return Response.ok().header(AUTHORIZATION, "Bearer " + jwtToken).build();
+            return Response.ok().header(AUTHORIZATION, "Bearer " + jwtToken).entity("{ \"Bearer\": "+jwtToken+" }").build();
         } else {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
@@ -129,8 +129,7 @@ public class UserApi {
     // -------------------------------------------
     
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    @Path("")
+    @Path("/")
     @JWTTokenNeeded
     public JsonArray All() {
         List<User> items = repository.All("User");
@@ -150,7 +149,6 @@ public class UserApi {
     }
     
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
     @Path("{id}")
     @JWTTokenNeeded
     public JsonObject Find(@PathParam("id") String id) {
@@ -167,7 +165,6 @@ public class UserApi {
     }
     
     @PUT
-    @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("edit")
     @JWTTokenNeeded
@@ -183,7 +180,6 @@ public class UserApi {
     
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     @Path("create")
     @JWTTokenNeeded
     public JsonObject Create(String content) {

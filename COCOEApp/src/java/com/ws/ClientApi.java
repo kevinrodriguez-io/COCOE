@@ -53,8 +53,7 @@ public class ClientApi {
     public ClientApi(){}
     
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    @Path("")
+    @Path("/")
     @JWTTokenNeeded
     public JsonArray All() {
         List<Client> items = repository.All("Client");
@@ -75,7 +74,6 @@ public class ClientApi {
     }
     
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
     @Path("{id}")
     @JWTTokenNeeded
     public JsonObject Find(@PathParam("id") String id) {
@@ -93,7 +91,6 @@ public class ClientApi {
     }
     
     @PUT
-    @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("edit")
     @JWTTokenNeeded
@@ -111,7 +108,6 @@ public class ClientApi {
     
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     @Path("create")
     @JWTTokenNeeded
     public JsonObject Create(String content) {
@@ -128,7 +124,6 @@ public class ClientApi {
     }
     
     @DELETE
-    @Produces(MediaType.APPLICATION_JSON)
     @Path("delete/{id}")
     @JWTTokenNeeded
     public JsonObject Delete(@PathParam("id") String id) {
