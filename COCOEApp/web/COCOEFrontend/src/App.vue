@@ -80,6 +80,7 @@ export default {
   computed: {
     isLoggedIn() {
       // Logic
+      return true;
     }
   },
   name: "App"

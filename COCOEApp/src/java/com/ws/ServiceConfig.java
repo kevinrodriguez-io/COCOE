@@ -34,6 +34,7 @@ public class ServiceConfig extends Application {
         resources.add(com.ws.AreaApi.class);
         //resources.add(com.ws.Acciones.class);
         resources.add(com.ws.ClientApi.class);
+        resources.add(com.ws.MetersessionApi.class);
         resources.add(com.ws.SettingsApi.class);
         resources.add(com.ws.UserApi.class);
     }

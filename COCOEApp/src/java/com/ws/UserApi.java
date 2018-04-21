@@ -65,12 +65,13 @@ public class UserApi {
     
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
     @Path("login")
     public Response Login(String content) {
         
         JsonObject object = Json.createReader(new StringReader(content)).readObject();
 
-        String username = object.getString("username");
+        String username = object.getString("userName");
         String password = object.getString("password");
         String passwordHash = HashUtil.HashToSHA256Base64(password);
         
@@ -83,15 +84,23 @@ public class UserApi {
                     .setExpiration(toDate(LocalDateTime.now().plusMinutes(15L)))
                     .signWith(SignatureAlgorithm.HS512, key)
                     .compact();
-            return Response.ok().header(AUTHORIZATION, "Bearer " + jwtToken).entity("{ \"Bearer\": "+jwtToken+" }").build();
+            return Response
+                    .ok()
+                    .header(AUTHORIZATION, "Bearer " + jwtToken)
+                    .entity("{ \"Message\": \"Login successful\", \"Bearer\": \""+jwtToken+"\" }")
+                    .build();
         } else {
-            return Response.status(Response.Status.UNAUTHORIZED).build();
+            return Response
+                    .status(Response.Status.UNAUTHORIZED)
+                    .entity("{\"Message\": \"Login failed\"}")
+                    .build();
         }
         
     }
     
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
     @Path("register")
     public Response Register(String content) {
         
@@ -104,7 +113,10 @@ public class UserApi {
         String lastName = object.getString("lastName");
         
         if (repository.All("User").stream().anyMatch(I->I.getUserName().equals(username))) {
-            return Response.status(Response.Status.CONFLICT).build();
+            return Response
+                    .status(Response.Status.CONFLICT)
+                    .entity("{\"Message\": \"User already exists\"}")
+                    .build();
         }
         
         repository.Create(new User(username, passwordHash, name, lastName, "EMPLOYEE", new Date(), new Date()));
@@ -118,7 +130,11 @@ public class UserApi {
             .signWith(SignatureAlgorithm.HS512, key)
             .compact();
         
-        return Response.ok().header(AUTHORIZATION, "Bearer " + jwtToken).build();
+        return Response
+                .ok()
+                .header(AUTHORIZATION, "Bearer " + jwtToken)
+                .entity("{ \"Message\": \"Register successful\", \"Bearer\": \""+jwtToken+"\" }")
+                .build();
         
     }
     
@@ -170,7 +186,7 @@ public class UserApi {
     @JWTTokenNeeded
     public JsonObject Edit(String content) {
         JsonObject jsonObject = Json.createReader(new StringReader(content)).readObject();
-        User item = repository.Get("User", Integer.parseInt(jsonObject.getString("id")));
+        User item = repository.Get("User", jsonObject.getInt("id"));
         item.setName(jsonObject.getString("name"));
         item.setLastName(jsonObject.getString("lastName"));
         item.setRole(jsonObject.getString("role"));
