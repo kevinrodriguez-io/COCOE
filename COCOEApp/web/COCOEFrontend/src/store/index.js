@@ -6,54 +6,75 @@ Vue.use(Vuex)
 
 export const INCREMENT = 'increment'
 export const DECREMENT = 'decrement'
-export const INCREMENTASYNC = 'incrementAsync'
-export const ISUSERLOGGEDIN = 'isUserLoggedIn'
+
 export const LOGIN = 'login'
 export const REGISTER = 'register'
+export const LOGOUT = 'logout'
+
+export const SETJWTTOKEN = 'setJwtToken'
+export const REMOVEJWTTOKEN = 'removeJwtToken'
 
 const LOCALSTORAGE_TOKEN = 'token'
 
 const state = {
-  count: 0,
-  userIsLoggedIn: false
+  jwtToken: (localStorage.getItem(LOCALSTORAGE_TOKEN) != 'undefined') ? localStorage.getItem(LOCALSTORAGE_TOKEN) : undefined
 }
 
 const getters = {
-  [ISUSERLOGGEDIN] (state) {
-    let token = localStorage.getItem(LOCALSTORAGE_TOKEN)
-    state.userIsLoggedIn = (token != null && token != undefined);
-    return state.userIsLoggedIn;
+  isUserLoggedIn (state) {
+    return state.jwtToken != null && state.jwtToken != undefined
   }
 }
 
 const mutations = {
-  [INCREMENT] (state) {
-    state.count++
+  [SETJWTTOKEN] (state, payload) {
+    localStorage.setItem(LOCALSTORAGE_TOKEN, payload.bearer)
+    state.jwtToken = payload.bearer
   },
-  [DECREMENT] (state) {
-    state.count--
+  [REMOVEJWTTOKEN] (state) {
+    localStorage.removeItem(LOCALSTORAGE_TOKEN)
+    state.jwtToken = undefined
   }
 }
 
 const actions = {
-  [INCREMENTASYNC] ({commit}) {
-    setTimeout(() =>{ commit(INCREMENT) },200)
-  },
   [LOGIN] ({commit}, payload) {
-    let requestContent = { username: payload.username, password: payload.password }
-    axios.post('http://localhost:8080/COCOEAPP/api/user/login', requestContent)
-    .then(response => {
-      //response.data.Bearer
-    })
-    .catch(error => {
-
+    let requestContent = { 
+      userName: payload.userName, 
+      password: payload.password
+    }
+    return new Promise((resolve, reject) => {
+      axios.post('http://localhost:8080/COCOEApp/api/user/login', requestContent)
+      .then(response => {
+        commit(SETJWTTOKEN, { bearer: response.data.Bearer })
+        resolve(response)
+      })
+      .catch(error => {
+        reject(error)
+      })
     })
   },
   [REGISTER] ({commit}, payload) {
-
+    let requestContent = { 
+      userName: payload.userName, 
+      password: payload.password,
+      name: payload.name,
+      lastName: payload.lastName
+    }
+    return new Promise((resolve, reject) => {
+      axios.post('http://localhost:8080/COCOEApp/api/user/register', requestContent)
+      .then(response => {
+        commit(SETJWTTOKEN, { bearer: response.data.Bearer })
+        resolve(response)
+      })
+      .catch(error => {
+        reject(error)
+      })
+    })
+  },
+  [LOGOUT] ({commit}) {
+    commit(REMOVEJWTTOKEN)
   }
 }
 
-export default new Vuex.Store({
-  state
-})
+export default new Vuex.Store({ state, getters, mutations, actions })

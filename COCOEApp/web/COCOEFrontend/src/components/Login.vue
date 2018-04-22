@@ -36,6 +36,7 @@
 
 </template>
 <script>
+import { LOGIN } from '../store'
 export default {
   data () {
     return {
@@ -52,11 +53,21 @@ export default {
   },
   watch: {
     loader () {
-      const l = this.loader
-      this[l] = !this[l]
-      console.log(l)
-      setTimeout(()=>(this[l] = false),3000)
-      this.loader = null
+      let that = this
+      const l = that.loader
+      that[l] = !that[l]
+      let payload = { userName: that.username, password: that.password };
+      if (that.loader != null) {
+        that.$store.dispatch(LOGIN, payload)
+        .then(response => {
+          that.$router.push('/')
+          that[l] = false
+        }).catch(error => {
+          alert(error)
+          that[l] = false
+        })
+      }
+      that.loader = null
     }
   }
 }

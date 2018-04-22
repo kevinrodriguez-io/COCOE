@@ -5,7 +5,7 @@
  */
 package com.ws;
 
-import auth.JWTTokenNeeded;
+import filters.JWTTokenNeeded;
 import dao.Client;
 import dao.ClientRepository;
 import java.io.StringReader;

@@ -5,7 +5,7 @@
  */
 package com.ws;
 
-import auth.JWTTokenNeeded;
+import filters.JWTTokenNeeded;
 import dao.Area;
 import dao.AreaRepository;
 import dao.Metersession;
