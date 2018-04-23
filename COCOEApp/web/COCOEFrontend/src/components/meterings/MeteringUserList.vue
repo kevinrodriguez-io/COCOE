@@ -40,7 +40,7 @@
           <v-data-table :headers="headers" :items="items" hide-actions class="elevation-1" >
             <template slot="items" slot-scope="props">
               <td>{{ getUserNameFromId(props.item.userid) }}</td>
-              <td>{{ props.item.creationDate }}</td>
+              <!-- <td>{{ props.item.createdDate }}</td> -->
               <td class="justify-center layout px-0">
                 <!-- <v-btn icon class="mx-0" @click="editItem(props.item)">
                   <v-icon color="teal">edit</v-icon>
@@ -69,7 +69,7 @@
       dialog: false,
       headers: [
         { text: 'User', value: 'userid' },
-        { text: 'Creation date', value: 'createdDate' },
+        // { text: 'Creation date', value: 'createdDate' },
         { text: 'Actions', value: 'id', sortable: false }
       ],
       search: '',
@@ -181,7 +181,7 @@
       getUserNameFromId(id) {
         let results = this.users.filter(I=>I.id == id)
         if (results.length > 0) {
-          return results[0].name;
+          return results[0].userName;
         } else {
           return 'loading...'
         }

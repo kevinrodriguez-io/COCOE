@@ -5,10 +5,30 @@
  */
 package dao;
 
+import java.util.ArrayList;
+import java.util.List;
+import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import util.HibernateUtil;
+
 /**
  *
  * @author darkn
  */
 public class MetersessionRepository extends AbstractRepository<Metersession> {
-    
+    public List<Metersession> GeByUserId(int userId) { 
+        MetersessionuserRepository meterSessionUserRepository = new MetersessionuserRepository();
+        List<Metersession> all = super.All("Metersession");
+        List<Metersession> filtered = new ArrayList<Metersession>();
+        for (Metersession metersession : all) {
+            List<Metersessionuser> allMeterSessionUsers = meterSessionUserRepository.GetByMeterSessionId(metersession.getId());
+            for (Metersessionuser meterSessionUser : allMeterSessionUsers) {
+                if (meterSessionUser.getUserid() == userId) {
+                    filtered.add(metersession);
+                }
+            }
+        }
+        return filtered;
+    }
 }

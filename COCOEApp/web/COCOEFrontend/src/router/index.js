@@ -5,8 +5,11 @@ import Login from '@/components/Login'
 import Register from '@/components/Register'
 import AreaList from '@/components/areas/AreaList'
 import ClientList from '@/components/clients/ClientList'
+import Client from '@/components/clients/Client'
 import MeteringList from '@/components/meterings/MeteringList'
 import Metering from '@/components/meterings/Metering'
+import MyMeteringList from '@/components/meterings/MyMeteringList'
+import MyMetering from '@/components/meterings/MyMetering'
 import store from '../store';
 
 Vue.use(Router)
@@ -33,6 +36,12 @@ export default new Router({
       beforeEnter: (to, from, next) => { if (!store.getters.isUserLoggedIn) { next('/login') } else { next() } }
     },
     {
+      path: '/client/:id',
+      name: 'Client',
+      component: Client,
+      beforeEnter: (to, from, next) => { if (!store.getters.isUserLoggedIn) { next('/login') } else { next() } }
+    },
+    {
       path: '/meterings',
       name: 'Meterings',
       component: MeteringList,
@@ -42,6 +51,18 @@ export default new Router({
       path: '/metering/:id',
       name: 'Metering',
       component: Metering,
+      beforeEnter: (to, from, next) => { if (!store.getters.isUserLoggedIn) { next('/login') } else { next() } } 
+    },
+    {
+      path: '/mymeterings',
+      name: 'MyMeterings',
+      component: MyMeteringList,
+      beforeEnter: (to, from, next) => { if (!store.getters.isUserLoggedIn) { next('/login') } else { next() } } 
+    },
+    {
+      path: '/mymetering/:id',
+      name: 'MyMetering',
+      component: MyMetering,
       beforeEnter: (to, from, next) => { if (!store.getters.isUserLoggedIn) { next('/login') } else { next() } } 
     },
     {

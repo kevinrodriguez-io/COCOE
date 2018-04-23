@@ -75,7 +75,7 @@
               <td>{{ getAreaNameFromId(props.item.areaid) }}</td>
               <td>{{ props.item.header }}</td>
               <td>{{ props.item.status }}</td>
-              <td>{{ props.item.createdDate }}</td>
+              <!-- <td>{{ props.item.createdDate }}</td> -->
               <td class="justify-center layout px-0">
                 <v-btn icon class="mx-0" @click="editItem(props.item)">
                   <v-icon color="teal">edit</v-icon>
@@ -106,7 +106,7 @@
         { text: 'Area', value: 'areaid' },
         { text: 'Header', value: 'header' },
         { text: 'Status', value: 'status' },
-        { text: 'Creation date', value: 'createdDate' },
+        // { text: 'Creation date', value: 'createdDate' },
         { text: 'Actions', value: 'id', sortable: false }
       ],
       allItems: [],

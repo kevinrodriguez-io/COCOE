@@ -66,6 +66,26 @@ public class MetersessionApi {
     }
     
     @GET
+    @Path("/byUser/{userId}")
+    @JWTTokenNeeded
+    public JsonArray ByUser(@PathParam("userId") String userid) { 
+        Integer userIdentifier = Integer.parseInt(userid);
+        List<Metersession> items = repository.GeByUserId(userIdentifier);
+        JsonArrayBuilder jsonArrayBuilder = Json.createArrayBuilder();
+        for (Metersession item : items) {
+            jsonArrayBuilder.add(Json.createObjectBuilder()
+                .add("id", item.getId())
+                .add("areaid", item.getAreaid())
+                .add("header", item.getHeader())
+                .add("code", item.getCode())
+                .add("status", item.getStatus())
+                .add("createdDate", item.getCreatedDate().toString())
+            );
+        }
+        return jsonArrayBuilder.build();
+    }
+    
+    @GET
     @Path("{id}")
     @JWTTokenNeeded
     public JsonObject Find(@PathParam("id") String id) {

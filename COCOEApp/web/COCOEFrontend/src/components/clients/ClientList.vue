@@ -51,6 +51,11 @@
           </v-card-title>
           <v-data-table :headers="headers" :items="items" hide-actions class="elevation-1" >
             <template slot="items" slot-scope="props">
+              <td class="justify-center layout px-0">
+                <v-btn class="primary mx-0" small :to="getDetailsLink(props.item)">
+                  Details
+                </v-btn>
+              </td>
               <td>{{ props.item.code }}</td>
               <td>{{ props.item.name }}</td>
               <td>{{ props.item.lastName }}</td>
@@ -58,8 +63,8 @@
               <!-- <td>{{ props.item.active }}</td> -->
               <td>{{ getAreaNameFromId(props.item.areaid) }}</td>
               <td>{{ props.item.direction }}</td>
-              <td>{{ props.item.createdDate }}</td>
-              <td>{{ props.item.lastBillingDate }}</td>
+              <!-- <td>{{ props.item.createdDate }}</td> -->
+              <!-- <td>{{ props.item.lastBillingDate }}</td> -->
               <td class="justify-center layout px-0">
                 <v-btn icon class="mx-0" @click="editItem(props.item)">
                   <v-icon color="teal">edit</v-icon>
@@ -86,14 +91,15 @@
     data: () => ({
       dialog: false,
       headers: [
+        { text: '', value: 'id', sortable: false },
         { text: 'Code', value: 'code' },
         { text: 'Name', value: 'name' },
         { text: 'Last name', value: 'lastName' },
         { text: 'Active', value: 'active' },
         { text: 'Area', value: 'areaid' },
         { text: 'Direction', value: 'direction' },
-        { text: 'Creation date', value: 'createdDate' },
-        { text: 'Last billing date', value: 'lastBillingDate' },
+        // { text: 'Creation date', value: 'createdDate' },
+        // { text: 'Last billing date', value: 'lastBillingDate' },
         { text: 'Actions', value: 'id', sortable: false }
       ],
       search: '',
@@ -240,6 +246,10 @@
         } else {
           return 'loading...'
         }
+      },
+
+      getDetailsLink(item) {
+        return '/client/' + item.id
       }
 
     }

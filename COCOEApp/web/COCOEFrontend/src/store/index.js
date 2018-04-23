@@ -3,6 +3,7 @@ import Vuex from 'vuex'
 import axios from 'axios'
 import router from '@/router'
 import { debug } from 'util';
+import { parse } from 'url';
 
 Vue.use(Vuex)
 
@@ -25,6 +26,7 @@ export const DELETEAREA = 'deleteArea'
 /**********************************
  * CLIENT ACTION NAMES
 **********************************/
+export const FINDCLIENT = 'findClient'
 export const GETCLIENTS = 'getClients'
 export const CREATECLIENT = 'createClient'
 export const EDITCLIENT = 'editClient'
@@ -34,6 +36,7 @@ export const DELETECLIENT = 'deleteClient'
  * METERSESSION ACTION NAMES
 **********************************/
 export const GETMETERSESSIONS = 'getMeterSessions'
+export const GETMETERSESSIONSFORUSER = 'getMeterSessionsForUser'
 export const FINDMETERSESSION = 'findMeterSession'
 export const CREATEMETERSESSION = 'createMeterSession'
 export const EDITMETERSESSION = 'editMeterSession'
@@ -50,6 +53,8 @@ export const DELETEMETERSESSIONUSER = 'deleteMeterSessionUser'
  * USER ACTION NAMES
 **********************************/
 export const GETUSERS = 'getUsers'
+export const FINDCURRENTUSER = 'findCurrentUser'
+export const SETUPCURRENTUSERROLE = 'setupCurrentUserRole'
 export const FINDUSER = 'findUser'
 
 /**********************************
@@ -57,6 +62,8 @@ export const FINDUSER = 'findUser'
 **********************************/
 export const SETJWTTOKEN = 'setJwtToken'
 export const REMOVEJWTTOKEN = 'removeJwtToken'
+export const SETUSERROLE = 'setUserRole'
+export const REMOVEUSERROLE = 'removeUserRole'
 
 /**********************************
  * INTERNAL KEYS
@@ -65,12 +72,23 @@ const LOCALSTORAGE_TOKEN = 'token'
 const APIENDPOINT = "http://localhost:8080/COCOEApp/api/"
 
 const state = {
-  jwtToken: (localStorage.getItem(LOCALSTORAGE_TOKEN) != 'undefined') ? localStorage.getItem(LOCALSTORAGE_TOKEN) : undefined
+  jwtToken: (localStorage.getItem(LOCALSTORAGE_TOKEN) != 'undefined') ? localStorage.getItem(LOCALSTORAGE_TOKEN) : undefined,
+  userRole: null
 }
 
 const getters = {
   isUserLoggedIn (state) {
     return state.jwtToken != null && state.jwtToken != undefined
+  },
+  loggedUserName (state) {
+    if (state.jwtToken != undefined) {
+      return JSON.parse(window.atob(state.jwtToken.split('.')[1])).sub
+    } else {
+      return null
+    }
+  },
+  loggedUserRole (state) {
+    return state.userRole
   }
 }
 
@@ -82,6 +100,13 @@ const mutations = {
   [REMOVEJWTTOKEN] (state) {
     localStorage.removeItem(LOCALSTORAGE_TOKEN)
     state.jwtToken = undefined
+    state.userRole = null
+  },
+  [SETUSERROLE] (state, payload) {
+    state.userRole = payload.userRole
+  },
+  [REMOVEUSERROLE] (state) {
+    state.userRole = null
   }
 }
 
@@ -89,7 +114,7 @@ const actions = {
   /**********************************
    * AUTH REQUESTS HERE
   **********************************/
-  [LOGIN] ({commit}, payload) {
+  [LOGIN] (context, payload) {
     let requestContent = { 
       userName: payload.userName, 
       password: payload.password
@@ -97,15 +122,17 @@ const actions = {
     return new Promise((resolve, reject) => {
       axios.post(APIENDPOINT + 'user/login', requestContent)
       .then(response => {
-        commit(SETJWTTOKEN, { bearer: response.data.Bearer })
-        resolve(response)
+        context.commit(SETJWTTOKEN, { bearer: response.data.Bearer })
+        context.dispatch(SETUPCURRENTUSERROLE).then(i=>{
+          resolve(response)
+        }).catch(e=>{ reject(e) })
       })
       .catch(error => {
         reject(error)
       })
     })
   },
-  [REGISTER] ({commit}, payload) {
+  [REGISTER] (context, payload) {
     let requestContent = { 
       userName: payload.userName, 
       password: payload.password,
@@ -115,8 +142,10 @@ const actions = {
     return new Promise((resolve, reject) => {
       axios.post(APIENDPOINT + 'user/register', requestContent)
       .then(response => {
-        commit(SETJWTTOKEN, { bearer: response.data.Bearer })
-        resolve(response)
+        context.commit(SETJWTTOKEN, { bearer: response.data.Bearer })
+        context.dispatch(SETUPCURRENTUSERROLE).then(i=>{
+          resolve(response)
+        }).catch(e=>{ reject(e) })
       })
       .catch(error => {
         reject(error)
@@ -241,6 +270,27 @@ const actions = {
   /**********************************
    * CLIENT REQUESTS HERE
   **********************************/
+  [FINDCLIENT] (context, payload) {
+    return new Promise((resolve, reject) => {
+      let token = context.state.jwtToken
+      if (token != undefined) {
+        axios.get(APIENDPOINT + 'client/' + payload.id, { headers: { 'Authorization': 'Bearer ' + token } })
+        .then(response => { resolve(response) })
+        .catch(error => { 
+          if (error.response) {
+            if (error.response.status == 401) {
+              context.commit(REMOVEJWTTOKEN)
+              router.push('/login')
+            }
+          }
+          reject(error) 
+        })
+      } else {
+        router.push('/login')
+        reject('User is not logged in')
+      }
+    })
+  },
   [GETCLIENTS] (context) {
     return new Promise((resolve, reject) => {
       let token = context.state.jwtToken
@@ -370,6 +420,27 @@ const actions = {
       let token = context.state.jwtToken
       if (token != undefined) {
         axios.get(APIENDPOINT + 'metersession/', { headers: { 'Authorization': 'Bearer ' + token } })
+        .then(response => { resolve(response) })
+        .catch(error => { 
+          if (error.response) {
+            if (error.response.status == 401) {
+              context.commit(REMOVEJWTTOKEN)
+              router.push('/login')
+            }
+          }
+          reject(error) 
+        })
+      } else {
+        router.push('/login')
+        reject('User is not logged in')
+      }
+    })
+  },
+  [GETMETERSESSIONSFORUSER] (context) {
+    return new Promise((resolve, reject) => {
+      let token = context.state.jwtToken
+      if (token != undefined) {
+        axios.get(APIENDPOINT + 'metersession/byUser/' + payload.id, { headers: { 'Authorization': 'Bearer ' + token } })
         .then(response => { resolve(response) })
         .catch(error => { 
           if (error.response) {
@@ -541,6 +612,53 @@ const actions = {
       if (token != undefined) {
         axios.get(APIENDPOINT + 'user/' + payload.id, { headers: { 'Authorization': 'Bearer ' + token } })
         .then(response => { resolve(response) })
+        .catch(error => { 
+          if (error.response) {
+            if (error.response.status == 401) {
+              context.commit(REMOVEJWTTOKEN)
+              router.push('/login')
+            }
+          }
+          reject(error) 
+        })
+      } else {
+        router.push('/login')
+        reject('User is not logged in')
+      }
+    })
+  },
+  [FINDCURRENTUSER] (context) {
+    return new Promise((resolve, reject) => {
+      let token = context.state.jwtToken
+      let userName = context.getters.loggedUserName
+      if (token != undefined) {
+        axios.get(APIENDPOINT + 'user/findByUsername/' + userName, { headers: { 'Authorization': 'Bearer ' + token } })
+        .then(response => { resolve(response) })
+        .catch(error => { 
+          if (error.response) {
+            if (error.response.status == 401) {
+              context.commit(REMOVEJWTTOKEN)
+              router.push('/login')
+            }
+          }
+          reject(error) 
+        })
+      } else {
+        router.push('/login')
+        reject('User is not logged in')
+      }
+    })
+  },
+  [SETUPCURRENTUSERROLE] (context) {
+    return new Promise((resolve, reject) => {
+      let token = context.state.jwtToken
+      let userName = context.getters.loggedUserName
+      if (token != undefined) {
+        axios.get(APIENDPOINT + 'user/findByUsername/' + userName, { headers: { 'Authorization': 'Bearer ' + token } })
+        .then(response => { 
+          context.commit(SETUSERROLE, { userRole: response.data.role })
+          resolve(response) 
+        })
         .catch(error => { 
           if (error.response) {
             if (error.response.status == 401) {

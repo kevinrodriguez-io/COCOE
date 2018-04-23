@@ -5,10 +5,33 @@
  */
 package dao;
 
+import java.util.List;
+import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import util.HibernateUtil;
+
 /**
  *
  * @author Kevin Rodriguez
  */
 public class ClientRepository extends AbstractRepository<Client> {
-    
+    public List<Client> AllByArea(int areaid) {
+        Session session = null;
+        try {
+            SessionFactory factory = HibernateUtil.getSessionFactory();
+            session = factory.openSession();
+            session.beginTransaction();
+            Query query = session.createQuery("from Client where areaid = :identifier");
+            query.setParameter("identifier", areaid);
+            List<Client> list = query.list();
+            session.getTransaction().commit();
+            return list;
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+            return null;
+        } finally {
+            session.close();
+        }
+    }
 }

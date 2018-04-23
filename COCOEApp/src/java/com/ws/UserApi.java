@@ -174,6 +174,23 @@ public class UserApi {
             ).build();
     }
     
+    @GET
+    @Path("/findByUsername/{userName}")
+    @JWTTokenNeeded
+    public JsonObject FindByUsername(@PathParam("userName") String userName) {
+        User item = repository.GetByUsername(userName);
+        return Json.createObjectBuilder()
+                .add("id", item.getId())
+                .add("userName", item.getUserName())
+                .add("name", item.getName())
+                .add("lastName", item.getLastName())
+                .add("role", item.getRole())
+                .add("createdDate", item.getCreatedDate().toString())
+                .add("lastLoginDate", item.getLastLoginDate().toString()
+            ).build();
+    }
+    
+    
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("edit")

@@ -34,7 +34,7 @@
             <template slot="items" slot-scope="props">
               <td>{{ props.item.code }}</td>
               <td>{{ props.item.name }}</td>
-              <td>{{ props.item.createdDate }}</td>
+              <!-- <td>{{ props.item.createdDate }}</td> -->
               <td class="justify-center layout px-0">
                 <v-btn icon class="mx-0" @click="editItem(props.item)">
                   <v-icon color="teal">edit</v-icon>
@@ -63,7 +63,7 @@
       headers: [
         { text: 'Code', value: 'code' },
         { text: 'Name', value: 'name' },
-        { text: 'Creation date', value: 'createdDate' },
+        // { text: 'Creation date', value: 'createdDate' },
         { text: 'Actions', value: 'id', sortable: false }
       ],
       allItems: [],

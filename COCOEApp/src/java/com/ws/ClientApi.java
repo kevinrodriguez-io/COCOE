@@ -68,6 +68,28 @@ public class ClientApi {
     }
     
     @GET
+    @Path("/byarea/{areaid}")
+    @JWTTokenNeeded
+    public JsonArray ByArea(@PathParam("areaid") String areaid) {
+        Integer areaId = Integer.parseInt(areaid);
+        List<Client> items = repository.AllByArea(areaId);
+        JsonArrayBuilder jsonArrayBuilder = Json.createArrayBuilder();
+        for (Client item : items) {
+            jsonArrayBuilder.add(Json.createObjectBuilder()
+                .add("id", item.getId())
+                .add("code", item.getCode())
+                .add("name", item.getName())
+                .add("lastName", item.getLastName())
+                .add("active", item.isActive())
+                .add("areaid", item.getAreaid())
+                .add("direction", item.getDirection())
+                .add("createdDate", item.getCreatedDate().toString())
+                .add("lastBillingDate", item.getLastBillingDate().toString()));
+        }
+        return jsonArrayBuilder.build();
+    }
+    
+    @GET
     @Path("{id}")
     @JWTTokenNeeded
     public JsonObject Find(@PathParam("id") String id) {
