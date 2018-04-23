@@ -6,10 +6,9 @@
 package com.ws;
 
 import filters.JWTTokenNeeded;
-import dao.Area;
-import dao.AreaRepository;
-import dao.Settings;
-import dao.SettingsRepository;
+import dao.Client;
+import dao.Clientmetering;
+import dao.ClientmeteringRepository;
 import java.io.StringReader;
 import java.util.Date;
 import java.util.List;
@@ -29,35 +28,37 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
 
 /**
- * Fully working area api endpoint, it communicates with 
+ * Fully working client api endpoint, it communicates with 
  * Hibernate via Repository Pattern
  * @author COCOE
  */
-@Path("area")
-public class AreaApi {
-    
-    public static final String AREA_CODE_INCREMENTAL = "AREACODEINCREMENTAL";
+@Path("clientmetering")
+public class ClientmeteringApi {
     
     @Context
     private UriInfo context;
     
-    private AreaRepository repository = new AreaRepository();
-    private SettingsRepository settingsRepository = new SettingsRepository();
+    private ClientmeteringRepository repository = new ClientmeteringRepository();
     
-    public AreaApi(){}
+    public ClientmeteringApi(){}
     
     @GET
     @Path("/")
     @JWTTokenNeeded
     public JsonArray All() {
-        List<Area> items = repository.All("Area");
+        List<Clientmetering> items = repository.All("Clientmetering");
         JsonArrayBuilder jsonArrayBuilder = Json.createArrayBuilder();
-        for (Area item : items) {
+        for (Clientmetering item : items) {
             jsonArrayBuilder.add(Json.createObjectBuilder()
                 .add("id", item.getId())
-                .add("code", item.getCode())
-                .add("name", item.getName())
-                .add("createdDate", item.getCreatedDate().toString()));
+                .add("meterSessionId", item.getMeterSessionId())
+                .add("clientId", item.getClientId())
+                .add("amount", item.getAmount())
+                .add("uomId", item.getUomId())
+                .add("meteringDate", item.getMeteringDate().toString())
+                .add("billed", item.isBilled())
+                .add("createdDate", item.getCreatedDate().toString())
+            );
         }
         return jsonArrayBuilder.build();
     }
@@ -66,11 +67,15 @@ public class AreaApi {
     @Path("{id}")
     @JWTTokenNeeded
     public JsonObject Find(@PathParam("id") String id) {
-        Area item = repository.Get("Area", Integer.parseInt(id));
+        Clientmetering item = repository.Get("Clientmetering", Integer.parseInt(id));
         return Json.createObjectBuilder()
                 .add("id", item.getId())
-                .add("code", item.getCode())
-                .add("name", item.getName())
+                .add("meterSessionId", item.getMeterSessionId())
+                .add("clientId", item.getClientId())
+                .add("amount", item.getAmount())
+                .add("uomId", item.getUomId())
+                .add("meteringDate", item.getMeteringDate().toString())
+                .add("billed", item.isBilled())
                 .add("createdDate", item.getCreatedDate().toString()).build();
     }
     
@@ -80,15 +85,11 @@ public class AreaApi {
     @JWTTokenNeeded
     public JsonObject Edit(String content) {
         JsonObject jsonObject = Json.createReader(new StringReader(content)).readObject();
-        int areaId = jsonObject.getInt("id");
-        Area item = repository.Get("Area", areaId);
-        item.setName(jsonObject.getString("name"));
+        Clientmetering item = repository.Get("Clientmetering", Integer.parseInt(jsonObject.getString("id")));
+        item.setAmount(jsonObject.getInt("amount"));
+        item.setUomId(jsonObject.getInt("uomId"));
         repository.Update(item);
-        return Json.createObjectBuilder()
-            .add("id", item.getId())
-            .add("code", item.getCode())
-            .add("name", item.getName())
-            .add("createdDate", item.getCreatedDate().toString()).build();
+        return jsonObject;
     }
     
     @POST
@@ -97,30 +98,24 @@ public class AreaApi {
     @JWTTokenNeeded
     public JsonObject Create(String content) {
         JsonObject jsonObject = Json.createReader(new StringReader(content)).readObject();
-        
-        Settings setting = settingsRepository.Get(AREA_CODE_INCREMENTAL);
-        Integer newCode = Integer.parseInt(setting.getSettingValue())+1;
-        Area item = new Area(
-            jsonObject.getString("name"),
-            "ARE-"+newCode,
-            new Date()
+        Clientmetering item = new Clientmetering(
+                jsonObject.getInt("meterSessionId"), 
+                jsonObject.getInt("clientId"), 
+                jsonObject.getInt("amount"),
+                jsonObject.getInt("uomId"), 
+                new Date(), 
+                false, 
+                new Date()
         );
         repository.Create(item);
-        setting.setSettingValue(newCode.toString());
-        settingsRepository.Update(setting);
-        return Json.createObjectBuilder()
-            .add("id", item.getId())
-            .add("code", item.getCode())
-            .add("name", item.getName())
-            .add("createdDate", item.getCreatedDate().toString()).build();
+        return jsonObject;
     }
     
     @DELETE
     @Path("delete/{id}")
     @JWTTokenNeeded
     public JsonObject Delete(@PathParam("id") String id) {
-        Area item = repository.Get("Area", Integer.parseInt(id));
-        repository.Delete(item);
+        repository.Delete(repository.Get("Clientmetering", Integer.parseInt(id)));
         return Json.createObjectBuilder()
                 .add("result", true)
                 .build();

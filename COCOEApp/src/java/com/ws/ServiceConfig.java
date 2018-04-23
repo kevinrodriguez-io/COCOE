@@ -32,7 +32,9 @@ public class ServiceConfig extends Application {
     private void addRestResourceClasses(Set<Class<?>> resources) {
         resources.add(com.ws.AreaApi.class);
         resources.add(com.ws.ClientApi.class);
+        resources.add(com.ws.ClientmeteringApi.class);
         resources.add(com.ws.MetersessionApi.class);
+        resources.add(com.ws.MetersessionuserApi.class);
         resources.add(com.ws.SettingsApi.class);
         resources.add(com.ws.UserApi.class);
         resources.add(filters.CORSFilter.class);

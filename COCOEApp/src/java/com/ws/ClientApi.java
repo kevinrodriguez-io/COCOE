@@ -8,26 +8,17 @@ package com.ws;
 import filters.JWTTokenNeeded;
 import dao.Client;
 import dao.ClientRepository;
+import dao.Settings;
+import dao.SettingsRepository;
 import java.io.StringReader;
-import java.io.StringWriter;
-import java.math.BigDecimal;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonArrayBuilder;
 import javax.json.JsonObject;
-import javax.json.JsonObjectBuilder;
-import javax.json.JsonReader;
-import javax.json.JsonWriter;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.Produces;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -45,10 +36,13 @@ import javax.ws.rs.core.MediaType;
 @Path("client")
 public class ClientApi {
     
+    public static final String CLIENT_CODE_INCREMENTAL = "CLIENTCODEINCREMENTAL";
+    
     @Context
     private UriInfo context;
     
     private ClientRepository repository = new ClientRepository();
+    private SettingsRepository settingsRepository = new SettingsRepository();
     
     public ClientApi(){}
     
@@ -96,14 +90,23 @@ public class ClientApi {
     @JWTTokenNeeded
     public JsonObject Edit(String content) {
         JsonObject jsonObject = Json.createReader(new StringReader(content)).readObject();
-        Client item = repository.Get("Client", Integer.parseInt(jsonObject.getString("id")));
+        Client item = repository.Get("Client", jsonObject.getInt("id"));
         item.setName(jsonObject.getString("name"));
         item.setLastName(jsonObject.getString("lastName"));
-        item.setActive(jsonObject.getBoolean("isActive"));
+        item.setActive(jsonObject.getBoolean("active"));
         item.setAreaid(jsonObject.getInt("areaid"));
         item.setDirection(jsonObject.getString("direction"));
         repository.Update(item);
-        return jsonObject;
+        return Json.createObjectBuilder()
+            .add("id", item.getId())
+            .add("code", item.getCode())
+            .add("name", item.getName())
+            .add("lastName", item.getLastName())
+            .add("active", item.isActive())
+            .add("areaid", item.getAreaid())
+            .add("direction", item.getDirection())
+            .add("createdDate", item.getCreatedDate().toString())
+            .add("lastBillingDate", item.getLastBillingDate().toString()).build();
     }
     
     @POST
@@ -112,15 +115,28 @@ public class ClientApi {
     @JWTTokenNeeded
     public JsonObject Create(String content) {
         JsonObject jsonObject = Json.createReader(new StringReader(content)).readObject();
-        Client item = new Client("CODE", 
-                jsonObject.getString("name"), 
+        Settings setting = settingsRepository.Get(CLIENT_CODE_INCREMENTAL);
+        Integer newCode = Integer.parseInt(setting.getSettingValue())+1;
+        Client item = new Client("CTE-"+newCode.toString(), 
+                jsonObject.getString("name"),
                 jsonObject.getString("lastName"), 
-                jsonObject.getBoolean("isActive"), 
+                jsonObject.getBoolean("active"), 
                 jsonObject.getInt("areaid"), 
                 jsonObject.getString("direction"), new Date(), new Date()
         );
         repository.Create(item);
-        return jsonObject;
+        setting.setSettingValue(newCode.toString());
+        settingsRepository.Update(setting);
+        return Json.createObjectBuilder()
+            .add("id", item.getId())
+            .add("code", item.getCode())
+            .add("name", item.getName())
+            .add("lastName", item.getLastName())
+            .add("active", item.isActive())
+            .add("areaid", item.getAreaid())
+            .add("direction", item.getDirection())
+            .add("createdDate", item.getCreatedDate().toString())
+            .add("lastBillingDate", item.getLastBillingDate().toString()).build();
     }
     
     @DELETE

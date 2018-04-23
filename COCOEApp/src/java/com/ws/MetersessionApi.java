@@ -6,30 +6,19 @@
 package com.ws;
 
 import filters.JWTTokenNeeded;
-import dao.Area;
-import dao.AreaRepository;
 import dao.Metersession;
 import dao.MetersessionRepository;
+import dao.Settings;
+import dao.SettingsRepository;
 import java.io.StringReader;
-import java.io.StringWriter;
-import java.math.BigDecimal;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonArrayBuilder;
 import javax.json.JsonObject;
-import javax.json.JsonObjectBuilder;
-import javax.json.JsonReader;
-import javax.json.JsonWriter;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.Produces;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -47,11 +36,14 @@ import javax.ws.rs.core.MediaType;
 @Path("metersession")
 public class MetersessionApi {
     
+    public static final String METERSESSION_CODE_INCREMENTAL = "METERSESSIONCODEINCREMENTAL";
+    
     @Context
     private UriInfo context;
     
     private MetersessionRepository repository = new MetersessionRepository();
-    
+    private SettingsRepository settingsRepository = new SettingsRepository();
+    s
     public MetersessionApi(){}
     
     @GET
@@ -93,11 +85,17 @@ public class MetersessionApi {
     @JWTTokenNeeded
     public JsonObject Edit(String content) {
         JsonObject jsonObject = Json.createReader(new StringReader(content)).readObject();
-        Metersession item = repository.Get("Metersession", Integer.parseInt(jsonObject.getString("id")));
+        Metersession item = repository.Get("Metersession", jsonObject.getInt("id"));
         item.setHeader(jsonObject.getString("header"));
         item.setStatus(jsonObject.getString("status"));
         repository.Update(item);
-        return jsonObject;
+                return Json.createObjectBuilder()
+                .add("id", item.getId())
+                .add("areaid", item.getAreaid())
+                .add("header", item.getHeader())
+                .add("code", item.getCode())
+                .add("status", item.getStatus())
+                .add("createdDate", item.getCreatedDate().toString()).build();
     }
     
     @POST
@@ -106,15 +104,25 @@ public class MetersessionApi {
     @JWTTokenNeeded
     public JsonObject Create(String content) {
         JsonObject jsonObject = Json.createReader(new StringReader(content)).readObject();
+        Settings setting = settingsRepository.Get(METERSESSION_CODE_INCREMENTAL);
+        Integer newCode = Integer.parseInt(setting.getSettingValue())+1;
         Metersession item = new Metersession(
             jsonObject.getInt("areaid"), 
             jsonObject.getString("header"), 
-            "CODE", 
+            "MSN-"+newCode, 
             jsonObject.getString("status"), 
             new Date()
         );
         repository.Create(item);
-        return jsonObject;
+        setting.setSettingValue(newCode.toString());
+        settingsRepository.Update(setting);
+        return Json.createObjectBuilder()
+            .add("id", item.getId())
+            .add("areaid", item.getAreaid())
+            .add("header", item.getHeader())
+            .add("code", item.getCode())
+            .add("status", item.getStatus())
+            .add("createdDate", item.getCreatedDate().toString()).build();
     }
     
     @DELETE

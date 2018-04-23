@@ -6,21 +6,13 @@
 package com.ws;
 
 import filters.JWTTokenNeeded;
-import dao.Area;
 import dao.User;
 import dao.UserRepository;
 import java.io.StringReader;
-import java.io.StringWriter;
-import java.math.BigDecimal;
 import java.util.List;
 import javax.json.Json;
 import javax.json.JsonArrayBuilder;
 import javax.json.JsonObject;
-import javax.json.JsonObjectBuilder;
-import javax.json.JsonReader;
-import javax.json.JsonWriter;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.Produces;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -31,6 +23,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.core.MediaType;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import javax.ws.rs.core.Context;
 import java.security.Key;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -54,6 +47,7 @@ public class UserApi {
     private UriInfo context;
     
     private UserRepository repository = new UserRepository();
+    
     
     public UserApi(){}
     

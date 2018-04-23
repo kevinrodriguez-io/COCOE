@@ -3,7 +3,7 @@
   <v-app v-if="isLoggedIn">
     <v-navigation-drawer blue persistent :mini-variant="miniVariant" :clipped="clipped" v-model="drawer" enable-resize-watcher app>
       <v-list>
-        <v-list-tile value="true" v-for="(item, i) in items" :key="i" @click="1 == 1">
+        <v-list-tile value="true" v-for="(item, i) in items" :key="i" @click="1 == 1" :to="item.route">
           <v-list-tile-action>
             <v-icon v-html="item.icon"></v-icon>
           </v-list-tile-action>
@@ -24,9 +24,9 @@
       <!-- <v-btn icon @click.stop="fixed = !fixed">
         <v-icon>remove</v-icon>
       </v-btn> -->
-      <v-toolbar-title v-text="title"></v-toolbar-title>
+      <v-toolbar-title><v-icon>lightbulb_outline</v-icon> COCOE</v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn  class="indigo darken-5"> Exit
+      <v-btn @click="exit" class="indigo darken-5"> Exit
         <v-icon>exit_to_app</v-icon>
       </v-btn>
     </v-toolbar>
@@ -34,7 +34,7 @@
       <router-view/>
     </v-content>
     <v-footer :fixed="fixed" app>
-      <span>&copy; 2017</span>
+      <span>&copy; 2018</span>
     </v-footer>
   </v-app>
 
@@ -45,6 +45,7 @@
 </template>
 
 <script>
+import { LOGOUT } from './store'
 export default {
   data() {
     return {
@@ -55,17 +56,17 @@ export default {
         {
           icon: "place",
           title: "Areas",
-          route: "/area"
+          route: "/areas"
         },
         {
           icon: "person",
           title: "Clients",
-          route: "/client"
+          route: "/clients"
         },
         {
           icon: "pie_chart",
           title: "Meterings",
-          route: "/client"
+          route: "/meterings"
         },
         {
           icon: "insert_drive_file",
@@ -73,14 +74,18 @@ export default {
           route: "/client"
         }
       ],
-      miniVariant: false,
-      title: "COCOE"
+      miniVariant: false
     };
   },
   computed: {
     isLoggedIn() {
-      // Logic
-      return true;
+      return this.$store.getters.isUserLoggedIn
+    }
+  },
+  methods: {
+    exit (event) {
+      this.$store.dispatch(LOGOUT)
+      this.$router.push({name:'Login'})
     }
   },
   name: "App"
