@@ -23,7 +23,7 @@
         </v-layout> -->
       </v-card>
     </v-flex>
-    <meteringuser-list></meteringuser-list>
+    <meteringuser-list :meterSessionId="$route.params.id"></meteringuser-list>
   </section>
 </div>
 </template>

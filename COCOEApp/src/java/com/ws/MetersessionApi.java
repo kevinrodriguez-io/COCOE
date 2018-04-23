@@ -43,7 +43,7 @@ public class MetersessionApi {
     
     private MetersessionRepository repository = new MetersessionRepository();
     private SettingsRepository settingsRepository = new SettingsRepository();
-    s
+
     public MetersessionApi(){}
     
     @GET

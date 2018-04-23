@@ -11,6 +11,7 @@ import dao.MetersessionuserRepository;
 import java.io.StringReader;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonArrayBuilder;
@@ -58,6 +59,28 @@ public class MetersessionuserApi {
     }
     
     @GET
+    @Path("/byMeterSession/{meterSessionId}")
+    @JWTTokenNeeded
+    public JsonArray ByMeterSession(@PathParam("meterSessionId") String id) {
+        Integer meterSessionId = Integer.parseInt(id);
+        
+        List<Metersessionuser> items = repository.All("Metersessionuser").stream()
+                .filter(I->I.getMetersessionid() == meterSessionId)
+                .collect(Collectors.toList());
+        
+        JsonArrayBuilder jsonArrayBuilder = Json.createArrayBuilder();
+        for (Metersessionuser item : items) {
+            jsonArrayBuilder.add(Json.createObjectBuilder()
+                .add("id", item.getId())
+                .add("metersessionid", item.getMetersessionid())
+                .add("userid", item.getUserid())
+                .add("createdDate", item.getCreatedDate().toString())
+            );
+        }
+        return jsonArrayBuilder.build();
+    }
+    
+    @GET
     @Path("{id}")
     @JWTTokenNeeded
     public JsonObject Find(@PathParam("id") String id) {
@@ -82,7 +105,12 @@ public class MetersessionuserApi {
             new Date()
         );
         repository.Create(item);
-        return jsonObject;
+        return Json.createObjectBuilder()
+                .add("id", item.getId())
+                .add("metersessionid", item.getMetersessionid())
+                .add("userid", item.getUserid())
+                .add("createdDate", item.getCreatedDate().toString())
+                .build();
     }
     
     @DELETE

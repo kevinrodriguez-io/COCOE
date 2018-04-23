@@ -40,6 +40,19 @@ export const EDITMETERSESSION = 'editMeterSession'
 export const DELETEMETERSESSION = 'deleteMeterSession'
 
 /**********************************
+ * METERSESSIONUSER ACTION NAMES
+**********************************/
+export const GETMETERSESSIONUSERSBYMETERSESSION = 'getMeterSessionUsersByMeterSession'
+export const CREATEMETERSESSIONUSER = 'createMeterSessionUser'
+export const DELETEMETERSESSIONUSER = 'deleteMeterSessionUser'
+
+/**********************************
+ * USER ACTION NAMES
+**********************************/
+export const GETUSERS = 'getUsers'
+export const FINDUSER = 'findUser'
+
+/**********************************
  * AUTH MUTATION NAMES
 **********************************/
 export const SETJWTTOKEN = 'setJwtToken'
@@ -73,7 +86,9 @@ const mutations = {
 }
 
 const actions = {
-  
+  /**********************************
+   * AUTH REQUESTS HERE
+  **********************************/
   [LOGIN] ({commit}, payload) {
     let requestContent = { 
       userName: payload.userName, 
@@ -444,8 +459,125 @@ const actions = {
         reject('User is not logged in')
       }
     })
-  }
+  },
 
+  /**********************************
+   * METERSESSIONUSER REQUESTS HERE
+  **********************************/
+  [GETMETERSESSIONUSERSBYMETERSESSION] (context, payload) {
+    return new Promise((resolve, reject) => {
+      let token = context.state.jwtToken
+      if (token != undefined) {
+        axios.get(APIENDPOINT + 'metersessionuser/byMeterSession/' + payload.meterSessionId, { headers: { 'Authorization': 'Bearer ' + token } })
+        .then(response => { resolve(response) })
+        .catch(error => { 
+          if (error.response) {
+            if (error.response.status == 401) {
+              context.commit(REMOVEJWTTOKEN)
+              router.push('/login')
+            }
+          }
+          reject(error) 
+        })
+      } else {
+        router.push('/login')
+        reject('User is not logged in')
+      }
+    })
+  },
+  [CREATEMETERSESSIONUSER] (context, payload) {
+    let requestContent = { 
+      metersessionid: payload.metersessionid, 
+      userid: payload.userid
+    }
+    return new Promise((resolve, reject) => {
+      let token = context.state.jwtToken
+      if (token != undefined) {
+        axios.post(APIENDPOINT + 'metersessionuser/create', requestContent, { headers: { 'Authorization': 'Bearer ' + token } })
+        .then(response => { resolve(response) })
+        .catch(error => {
+          if (error.response) {
+            if (error.response.status == 401) {
+              context.commit(REMOVEJWTTOKEN)
+              router.push('/login')
+            }
+          }
+          reject(error) 
+        })
+      } else {
+        router.push('/login')
+        reject('User is not logged in')
+      }
+    })
+  },
+  [DELETEMETERSESSIONUSER] (context, payload) {
+    return new Promise((resolve, reject) => {
+      let token = context.state.jwtToken
+      if (token != undefined) {
+        axios.delete(APIENDPOINT + 'metersessionuser/delete/' + payload.id, { headers: { 'Authorization': 'Bearer ' + token } })
+        .then(response => { resolve(response) })
+        .catch(error => {
+          if (error.response) {
+            if (error.response.status == 401) {
+              context.commit(REMOVEJWTTOKEN)
+              router.push('/login')
+            }
+          }
+          reject(error) 
+        })
+      } else {
+        router.push('/login')
+        reject('User is not logged in')
+      }
+    })
+  },
+  
+  /**********************************
+   * USER REQUESTS HERE
+  **********************************/
+  [FINDUSER] (context, payload) {
+    return new Promise((resolve, reject) => {
+      let token = context.state.jwtToken
+      if (token != undefined) {
+        axios.get(APIENDPOINT + 'user/' + payload.id, { headers: { 'Authorization': 'Bearer ' + token } })
+        .then(response => { resolve(response) })
+        .catch(error => { 
+          if (error.response) {
+            if (error.response.status == 401) {
+              context.commit(REMOVEJWTTOKEN)
+              router.push('/login')
+            }
+          }
+          reject(error) 
+        })
+      } else {
+        router.push('/login')
+        reject('User is not logged in')
+      }
+    })
+  },
+  [GETUSERS] (context) {
+    return new Promise((resolve, reject) => {
+      let token = context.state.jwtToken
+      if (token != undefined) {
+        axios.get(APIENDPOINT + 'user/', { headers: { 'Authorization': 'Bearer ' + token } })
+        .then(response => { resolve(response) })
+        .catch(error => { 
+          if (error.response) {
+            if (error.response.status == 401) {
+              context.commit(REMOVEJWTTOKEN)
+              router.push('/login')
+            }
+          }
+          reject(error) 
+        })
+      } else {
+        router.push('/login')
+        reject('User is not logged in')
+      }
+    })
+  },
+  
 }
 
 export default new Vuex.Store({ state, getters, mutations, actions })

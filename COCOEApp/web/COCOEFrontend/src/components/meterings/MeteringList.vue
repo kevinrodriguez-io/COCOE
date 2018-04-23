@@ -169,7 +169,9 @@
         this.items = this.allItems.slice()
         this.items = this.items.filter(I => 
           I.code.toLowerCase().includes(text.toLowerCase()) ||
-          I.name.toLowerCase().includes(text.toLowerCase())
+          I.header.toLowerCase().includes(text.toLowerCase()) ||
+          this.getAreaNameFromId(I.areaid).toLowerCase().includes(text.toLowerCase()) ||
+          I.status.toLowerCase().includes(text.toLowerCase())
         )
       }
     },
