@@ -100,8 +100,8 @@ public class MetersessionuserApi {
     public JsonObject Create(String content) {
         JsonObject jsonObject = Json.createReader(new StringReader(content)).readObject();
         Metersessionuser item = new Metersessionuser(
-            jsonObject.getInt("metersessionid"),
             jsonObject.getInt("userid"),
+            jsonObject.getInt("metersessionid"),
             new Date()
         );
         repository.Create(item);

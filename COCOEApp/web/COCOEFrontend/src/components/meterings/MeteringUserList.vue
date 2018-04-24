@@ -121,6 +121,7 @@
     methods: {
       initialize () {
         let that = this
+        console.log(GETMETERSESSIONUSERSBYMETERSESSION + this.meterSessionId)
         that.$store.dispatch(GETMETERSESSIONUSERSBYMETERSESSION, { meterSessionId: this.meterSessionId })
         .then(response => {
           that.allItems = response.data
@@ -179,6 +180,7 @@
       },
 
       getUserNameFromId(id) {
+        console.log('calling: getUserNameFromId('+id+')')
         let results = this.users.filter(I=>I.id == id)
         if (results.length > 0) {
           return results[0].userName;

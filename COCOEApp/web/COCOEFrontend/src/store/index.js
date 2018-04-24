@@ -436,7 +436,7 @@ const actions = {
       }
     })
   },
-  [GETMETERSESSIONSFORUSER] (context) {
+  [GETMETERSESSIONSFORUSER] (context, payload) {
     return new Promise((resolve, reject) => {
       let token = context.state.jwtToken
       if (token != undefined) {

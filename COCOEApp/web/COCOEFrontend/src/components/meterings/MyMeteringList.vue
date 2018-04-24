@@ -93,7 +93,7 @@
     </section>
 </template>
 <script>
-  import { GETAREAS, GETMETERSESSIONS, CREATEMETERSESSION, EDITMETERSESSION, DELETEMETERSESSION } from '@/store'
+  import { GETMETERSESSIONSFORUSER, FINDCURRENTUSER, GETAREAS, GETMETERSESSIONS, CREATEMETERSESSION, EDITMETERSESSION, DELETEMETERSESSION } from '@/store'
   export default {
     data: () => ({
       dialog: false,
@@ -178,14 +178,17 @@
     methods: {
       initialize () {
         let that = this
-        that.$store.dispatch(GETMETERSESSIONS)
-        .then(response => {
-          that.allItems = response.data
-          that.items = response.data
+        that.$store.dispatch(FINDCURRENTUSER)
+        .then(userResponse => {
+          that.$store.dispatch(GETMETERSESSIONSFORUSER, { id: userResponse.data.id })
+          .then(response => {
+            that.allItems = response.data
+            that.items = response.data
+          })
+          .catch(error => { console.log(error) })
         })
-        .catch(error => {
-          console.log(error)
-        })
+        .catch(userError => { console.log(userError) })
+        
         that.$store.dispatch(GETAREAS)
         .then(response => {
           that.areas = response.data

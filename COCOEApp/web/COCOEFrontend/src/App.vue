@@ -111,11 +111,13 @@ export default {
     }
   },
   created () {
-    this,initialize()
+    this.initialize()
   },
   methods: {
     initialize () {
-      this.$store.dispatch(SETUPCURRENTUSERROLE)
+      if (this.isLoggedIn) {
+        this.$store.dispatch(SETUPCURRENTUSERROLE).catch(e => { console.log(e) })
+      }
     },
     exit (event) {
       this.$store.dispatch(LOGOUT)
