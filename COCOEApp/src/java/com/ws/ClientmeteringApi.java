@@ -25,7 +25,10 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PUT;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import javax.ws.rs.core.Response;
 
 /**
  * Fully working client api endpoint, it communicates with 
@@ -64,6 +67,28 @@ public class ClientmeteringApi {
     }
     
     @GET
+    @Path("/byclient/{clientid}")
+    @JWTTokenNeeded
+    public JsonArray AllByClient(@PathParam("clientid") String clientid) {
+        Integer clientId = Integer.parseInt(clientid);
+        List<Clientmetering> items = repository.AllByClient(clientId);
+        JsonArrayBuilder jsonArrayBuilder = Json.createArrayBuilder();
+        for (Clientmetering item : items) {
+            jsonArrayBuilder.add(Json.createObjectBuilder()
+                .add("id", item.getId())
+                .add("meterSessionId", item.getMeterSessionId())
+                .add("clientId", item.getClientId())
+                .add("amount", item.getAmount())
+                .add("uomId", item.getUomId())
+                .add("meteringDate", item.getMeteringDate().toString())
+                .add("billed", item.isBilled())
+                .add("createdDate", item.getCreatedDate().toString())
+            );
+        }
+        return jsonArrayBuilder.build();
+    }
+    
+    @GET
     @Path("{id}")
     @JWTTokenNeeded
     public JsonObject Find(@PathParam("id") String id) {
@@ -79,6 +104,35 @@ public class ClientmeteringApi {
                 .add("createdDate", item.getCreatedDate().toString()).build();
     }
     
+    @GET
+    @Path("/byclient/{clientid}/bymetersession/{metersessionid}")
+    @Produces(APPLICATION_JSON)
+    @JWTTokenNeeded
+    public Response FindByClientAndByMeterSession(
+        @PathParam("clientid") String clientid,
+        @PathParam("metersessionid") String metersessionid
+    ) {
+        Integer clientId = Integer.parseInt(clientid);
+        Integer metersessionId = Integer.parseInt(metersessionid);
+        Clientmetering item = repository.FindByClientAndByMeterSession(clientId, metersessionId);
+        if (item != null) {
+            JsonObject json = Json.createObjectBuilder()
+                    .add("id", item.getId())
+                    .add("meterSessionId", item.getMeterSessionId())
+                    .add("clientId", item.getClientId())
+                    .add("amount", item.getAmount())
+                    .add("uomId", item.getUomId())
+                    .add("meteringDate", item.getMeteringDate().toString())
+                    .add("billed", item.isBilled())
+                    .add("createdDate", item.getCreatedDate().toString()).build();
+            return Response.ok(json.toString()).build();
+        } else {
+            return Response
+                .status(Response.Status.NOT_FOUND)
+                .build();
+        }
+    }
+    
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("edit")
@@ -87,9 +141,17 @@ public class ClientmeteringApi {
         JsonObject jsonObject = Json.createReader(new StringReader(content)).readObject();
         Clientmetering item = repository.Get("Clientmetering", Integer.parseInt(jsonObject.getString("id")));
         item.setAmount(jsonObject.getInt("amount"));
-        item.setUomId(jsonObject.getInt("uomId"));
+        //item.setUomId(jsonObject.getInt("uomId"));
         repository.Update(item);
-        return jsonObject;
+        return Json.createObjectBuilder()
+            .add("id", item.getId())
+            .add("meterSessionId", item.getMeterSessionId())
+            .add("clientId", item.getClientId())
+            .add("amount", item.getAmount())
+            .add("uomId", item.getUomId())
+            .add("meteringDate", item.getMeteringDate().toString())
+            .add("billed", item.isBilled())
+            .add("createdDate", item.getCreatedDate().toString()).build();
     }
     
     @POST
@@ -102,13 +164,22 @@ public class ClientmeteringApi {
                 jsonObject.getInt("meterSessionId"), 
                 jsonObject.getInt("clientId"), 
                 jsonObject.getInt("amount"),
-                jsonObject.getInt("uomId"), 
+                1,
+                //jsonObject.getInt("uomId"), 
                 new Date(), 
                 false, 
                 new Date()
         );
         repository.Create(item);
-        return jsonObject;
+        return Json.createObjectBuilder()
+            .add("id", item.getId())
+            .add("meterSessionId", item.getMeterSessionId())
+            .add("clientId", item.getClientId())
+            .add("amount", item.getAmount())
+            .add("uomId", item.getUomId())
+            .add("meteringDate", item.getMeteringDate().toString())
+            .add("billed", item.isBilled())
+            .add("createdDate", item.getCreatedDate().toString()).build();
     }
     
     @DELETE

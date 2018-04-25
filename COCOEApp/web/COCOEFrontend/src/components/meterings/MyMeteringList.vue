@@ -193,9 +193,7 @@
         .then(response => {
           that.areas = response.data
         })
-        .catch(error => {
-          console.log(error)
-        })
+        .catch(error => { console.log(error) })
       },
 
       editItem (item) {

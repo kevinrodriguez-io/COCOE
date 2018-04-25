@@ -22,7 +22,7 @@ public class ClientRepository extends AbstractRepository<Client> {
             SessionFactory factory = HibernateUtil.getSessionFactory();
             session = factory.openSession();
             session.beginTransaction();
-            Query query = session.createQuery("from Client where areaid = :identifier");
+            Query query = session.createQuery("from Client where areaid = :identifier and active = 1");
             query.setParameter("identifier", areaid);
             List<Client> list = query.list();
             session.getTransaction().commit();

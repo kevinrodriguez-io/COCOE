@@ -24,10 +24,14 @@
       </v-card>
     </v-flex>
   </section>
+  <section>
+    <metering-clients :meterSessionId="$route.params.id"></metering-clients>
+  </section>
 </div>
 </template>
 <script>
 import { FINDMETERSESSION, FINDAREA } from '@/store'
+import MeteringClients from './MeteringClients'
 export default {
   data() {
     return {
@@ -65,6 +69,7 @@ export default {
       })
       .catch(error => { console.log(error) })
     }
-  }
+  },
+  components: { 'metering-clients': MeteringClients }
 }
 </script>

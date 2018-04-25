@@ -77,11 +77,11 @@ export default {
             title: "Meterings",
             route: "/meterings"
           },
-          {
-            icon: 'face',
-            title: 'Users',
-            route: '/users'
-          }
+          // {
+          //   icon: 'face',
+          //   title: 'Users',
+          //   route: '/users'
+          // }
         ]
       } else {
         return [

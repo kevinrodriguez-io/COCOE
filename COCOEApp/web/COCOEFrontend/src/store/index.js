@@ -28,6 +28,7 @@ export const DELETEAREA = 'deleteArea'
 **********************************/
 export const FINDCLIENT = 'findClient'
 export const GETCLIENTS = 'getClients'
+export const GETCLIENTSBYAREA = 'getClientsByArea'
 export const CREATECLIENT = 'createClient'
 export const EDITCLIENT = 'editClient'
 export const DELETECLIENT = 'deleteClient'
@@ -56,6 +57,17 @@ export const GETUSERS = 'getUsers'
 export const FINDCURRENTUSER = 'findCurrentUser'
 export const SETUPCURRENTUSERROLE = 'setupCurrentUserRole'
 export const FINDUSER = 'findUser'
+
+/**********************************
+ * CLIENTMETERING ACTION NAMES
+**********************************/
+export const FINDCLIENTMETERINGBYCLIENTANDMETERSESSION = 'findClientMeteringByClientAndByMeterSession'
+export const FINDCLIENTMETERING = 'findClientMetering'
+export const GETCLIENTMETERINGS = 'getClientMeterings'
+export const GETCLIENTMETERINGSBYCLIENT = 'getClientMeteringsByClient'
+export const CREATECLIENTMETERING = 'createClientMetering'
+// export const EDITCLIENTMETERING = 'editClientMetering'
+// export const DELETECLIENTMETERING = 'deleteClientMetering'
 
 /**********************************
  * AUTH MUTATION NAMES
@@ -296,6 +308,27 @@ const actions = {
       let token = context.state.jwtToken
       if (token != undefined) {
         axios.get(APIENDPOINT + 'client/', { headers: { 'Authorization': 'Bearer ' + token } })
+        .then(response => { resolve(response) })
+        .catch(error => { 
+          if (error.response) {
+            if (error.response.status == 401) {
+              context.commit(REMOVEJWTTOKEN)
+              router.push('/login')
+            }
+          }
+          reject(error) 
+        })
+      } else {
+        router.push('/login')
+        reject('User is not logged in')
+      }
+    })
+  },
+  [GETCLIENTSBYAREA] (context, payload) {
+    return new Promise((resolve, reject) => {
+      let token = context.state.jwtToken
+      if (token != undefined) {
+        axios.get(APIENDPOINT + 'client/byarea/' + payload.areaid , { headers: { 'Authorization': 'Bearer ' + token } })
         .then(response => { resolve(response) })
         .catch(error => { 
           if (error.response) {
@@ -695,6 +728,57 @@ const actions = {
       }
     })
   },
+
+  /**********************************
+   * CLIENT METERING REQUESTS HERE
+  **********************************/
+  [FINDCLIENTMETERINGBYCLIENTANDMETERSESSION] (context, payload) {
+    return new Promise((resolve, reject) => {
+      let token = context.state.jwtToken
+      if (token != undefined) {
+        axios.get(APIENDPOINT + 'clientmetering/byclient/' + payload.clientid + '/bymetersession/' + payload.metersessionid, { headers: { 'Authorization': 'Bearer ' + token } })
+        .then(response => { resolve(response) })
+        .catch(error => { 
+          if (error.response) {
+            if (error.response.status == 401) {
+              context.commit(REMOVEJWTTOKEN)
+              router.push('/login')
+            }
+          }
+          reject(error) 
+        })
+      } else {
+        router.push('/login')
+        reject('User is not logged in')
+      }
+    })
+  },
+  [CREATECLIENTMETERING] (context, payload) {
+    let requestContent = { 
+      meterSessionId: payload.meterSessionId, 
+      clientId: payload.clientId,
+      amount: payload.amount
+    }
+    return new Promise((resolve, reject) => {
+      let token = context.state.jwtToken
+      if (token != undefined) {
+        axios.post(APIENDPOINT + 'clientmetering/create', requestContent, { headers: { 'Authorization': 'Bearer ' + token } })
+        .then(response => { resolve(response) })
+        .catch(error => {
+          if (error.response) {
+            if (error.response.status == 401) {
+              context.commit(REMOVEJWTTOKEN)
+              router.push('/login')
+            }
+          }
+          reject(error) 
+        })
+      } else {
+        router.push('/login')
+        reject('User is not logged in')
+      }
+    })
+  }
   
 }
 
